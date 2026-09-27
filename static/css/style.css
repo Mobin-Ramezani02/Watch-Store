@@ -1,0 +1,25 @@
+/* استایل اختصاصی برای اسکرول‌بار مرورگر */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9; 
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1; 
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; 
+}
+
+/* اگر بخواهید به عکس ساعت‌ها افکت خاصی بدهید می‌توانید کلاس‌های خود را اینجا بنویسید */
+.watch-card-hover {
+    transition: transform 0.3s ease-in-out;
+}
+.watch-card-hover:hover {
+    transform: translateY(-5px);
+}

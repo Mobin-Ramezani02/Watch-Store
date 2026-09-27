@@ -1,0 +1,285 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}فروشگاه ساعت حرفه‌ای{% endblock %}</title>
+    
+    <!-- لینک به Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- تنظیم تیلویند برای استفاده از کلاس دارک -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    
+    <!-- بررسی تم سیستم یا انتخاب قبلی کاربر -->
+    <script>
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
+
+
+    <!-- اتصال فایل CSS اختصاصی خودمان -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- لینک به فونت زیبای فارسی -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;700&display=swap');
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 via-gray-100 to-yellow-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-900 flex flex-col min-h-screen text-gray-800 dark:text-gray-200 transition-all duration-500">
+    <!-- هاله‌های نوری پس‌زمینه -->
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute -top-[10%] -left-[10%] w-96 h-96 bg-yellow-400/15 dark:bg-yellow-500/5 rounded-full blur-3xl"></div>
+        <div class="absolute top-[60%] -right-[10%] w-[30rem] h-[30rem] bg-slate-400/15 dark:bg-slate-700/15 rounded-full blur-3xl"></div>
+    </div>
+    <!-- هدر سایت مدرن با افکت شیشه‌ای -->
+    <header class="sticky top-0 z-50 bg-white/70 dark:bg-slate-950/70 backdrop-blur-lg border-b border-gray-100 dark:border-slate-800 transition-all duration-300">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <!-- لوگو -->
+            <div class="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2 transition-colors">
+                <span class="text-3xl drop-shadow-md">⌚</span>
+                <a href="/" class="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-600 dark:from-white dark:to-gray-400">تیک‌آرت</a>
+            </div>
+            
+            <!-- منوی ناوبری -->
+            <nav class="hidden md:block">
+                <ul class="flex space-x-8 space-x-reverse font-bold text-sm text-gray-600 dark:text-gray-300">
+                    <li><a href="/" class="hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors">خانه</a></li>
+                    <li><a href="{% url 'shop:product_list' %}" class="hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors">مجموعه‌ها</a></li>
+                    <li><a href="{% url 'shop:product_list_by_category' 'men' %}" class="hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors">مردانه</a></li>
+                    <li><a href="{% url 'shop:product_list_by_category' 'women' %}" class="hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors">زنانه</a></li>
+                </ul>
+            </nav>
+
+            <!-- آیکون‌ها و دکمه تم -->
+            <div class="flex items-center gap-5 text-gray-600 dark:text-gray-300">
+
+                <!-- دکمه همبرگری مخصوص موبایل -->
+                <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-800 dark:text-white hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg transition-colors focus:outline-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
+                <!-- دکمه تم شب و روز (بدون تغییر در ID ها تا جاوااسکریپت شما کار کند) -->
+                <button id="theme-toggle" type="button" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-full p-2.5 transition-all focus:outline-none focus:ring-2 focus:ring-yellow-500/50">
+                    <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                </button>
+
+                <!-- سبد خرید و عدد آن -->
+                <a href="{% url 'cart:cart_detail' %}" class="relative hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                    {% if cart|length > 0 %}
+                        <span class="absolute -top-1.5 -right-2 bg-yellow-500 text-slate-900 text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow-lg border-2 border-white dark:border-slate-900">
+                            {{ cart|length }}
+                        </span>
+                    {% endif %}
+                </a>
+                <!-- پنل کاربری -->
+                {% if user.is_authenticated %}
+                    <div class="flex items-center gap-2">
+                        <!-- دکمه پروفایل -->
+                        <a href="{% url 'users:profile' %}" class="font-bold text-sm bg-slate-100 dark:bg-slate-800 px-4 py-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-gray-200 transition">👤 {{ user.username }}</a>
+                        
+                        <!-- دکمه خروج مدرن (به صورت فرم امن) -->
+                        <form action="{% url 'users:logout' %}" method="post" class="m-0 p-0 flex">
+                            {% csrf_token %}
+                            <button type="submit" title="خروج از حساب" class="font-bold text-sm bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-4 py-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50 transition">خروج</button>
+                        </form>
+                    </div>
+                {% else %}
+                    <!-- دکمه ورود -->
+                    <a href="{% url 'users:login' %}" class="font-bold text-sm text-white bg-slate-900 dark:bg-yellow-600 dark:text-slate-900 px-5 py-2.5 rounded-full hover:shadow-lg transition hover:-translate-y-0.5">ورود / ثبت‌نام</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- هاله تاریک پس‌زمینه (Overlay) -->
+    <div id="mobile-overlay" class="fixed inset-0 bg-black/60 z-[60] hidden transition-opacity duration-300 md:hidden backdrop-blur-sm"></div>
+
+    <!-- منوی کشویی موبایل -->
+    <aside id="mobile-sidebar" class="fixed top-0 right-0 h-full w-64 bg-white dark:bg-slate-900 z-[70] transform translate-x-full transition-transform duration-300 shadow-2xl md:hidden flex flex-col border-l border-gray-100 dark:border-slate-800">
+        <!-- هدر منوی کشویی -->
+        <div class="p-5 flex justify-between items-center border-b border-gray-100 dark:border-slate-800">
+            <span class="text-xl font-black text-slate-900 dark:text-white">منوی سایت</span>
+            <button id="close-menu-btn" class="text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        
+        <!-- لینک‌های منو -->
+        <nav class="flex flex-col p-5 space-y-4 font-bold text-gray-700 dark:text-gray-300">
+            <a href="/" class="hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors">خانه</a>
+            <a href="{% url 'shop:product_list' %}" class="hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors">مجموعه‌ها</a>
+            <a href="{% url 'shop:product_list_by_category' 'men' %}" class="hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors">مردانه</a>
+            <a href="{% url 'shop:product_list_by_category' 'women' %}" class="hover:text-yellow-600 dark:hover:text-yellow-400 transition-colors">زنانه</a>
+        </nav>
+    </aside>
+    <!-- محتوای اصلی (متغیر در هر صفحه) -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        {% block content %}
+        <!-- کدهای مربوط به صفحات دیگر (مثل لیست ساعت‌ها) اینجا قرار می‌گیرد -->
+        {% endblock %}
+    </main>
+
+    <!-- فوتر سایت (Footer) -->
+    <footer class="bg-slate-900 text-gray-300 py-12 mt-auto border-t-4 border-yellow-600">
+        <div class="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <h4 class="text-white font-bold text-lg mb-4">درباره تیک‌آرت</h4>
+                <p class="text-sm leading-relaxed text-gray-400">گالری تخصصی تیک‌آرت؛ ارائه جدیدترین و لوکس‌ترین ساعت‌های روز دنیا با ضمانت اصالت و کیفیت برتر.</p>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-lg mb-4">دسترسی سریع</h4>
+                <ul class="text-sm space-y-2 text-gray-400">
+                    <li><a href="{% url 'shop:product_list_by_category' 'men' %}" class="hover:text-slate-900 transition">مردانه</a></li>
+                    <li><a href="{% url 'shop:product_list_by_category' 'women' %}" class="hover:text-slate-900 transition">زنانه</a></li>
+                    <li><a href="#" class="hover:text-white transition">ساعت‌های هوشمند</a></li>
+                    <li><a href="#" class="hover:text-white transition">تخفیف‌ها</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-lg mb-4">خدمات مشتریان</h4>
+                <ul class="text-sm space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white transition">پیگیری سفارش</a></li>
+                    <li><a href="#" class="hover:text-white transition">رویه بازگرداندن کالا</a></li>
+                    <li><a href="#" class="hover:text-white transition">سوالات متداول</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-lg mb-4">تازه ترین خبرها</h4>
+                <p class="text-sm text-gray-400 mb-4">برای دریافت جدیدترین اخبار و تخفیف‌ها عضو خبرنامه شوید.</p>
+                <div class="flex">
+                    <input type="email" placeholder="ایمیل خود را وارد کنید" class="px-3 py-2 w-full text-sm rounded-r-md focus:outline-none text-gray-800">
+                    <button class="bg-gray-700 text-white px-4 rounded-l-md hover:bg-gray-600">ثبت</button>
+                </div>
+            </div>
+        </div>
+        <div class="text-center text-xs text-gray-500 mt-10 border-t border-slate-800 pt-6">
+            © ۱۴۰۵ تمامی حقوق برای گالری ساعت تیک‌آرت محفوظ است.
+        </div>
+    </footer>
+    <script>
+        var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+        var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+        // تغییر آیکون دکمه بر اساس تم فعلی در زمان لود صفحه
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            themeToggleLightIcon.classList.remove('hidden');
+        } else {
+            themeToggleDarkIcon.classList.remove('hidden');
+        }
+
+        var themeToggleBtn = document.getElementById('theme-toggle');
+
+        themeToggleBtn.addEventListener('click', function() {
+            // سوییچ کردن نمایش آیکون‌ها
+            themeToggleDarkIcon.classList.toggle('hidden');
+            themeToggleLightIcon.classList.toggle('hidden');
+
+            // ذخیره و اعمال تغییر تم
+            if (localStorage.getItem('color-theme')) {
+                if (localStorage.getItem('color-theme') === 'light') {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                }
+            } else {
+                if (document.documentElement.classList.contains('dark')) {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                } else {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                }
+            }
+        });
+
+        // اسکریپت‌های مربوط به منوی کشویی موبایل
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const closeMenuBtn = document.getElementById('close-menu-btn');
+        const mobileSidebar = document.getElementById('mobile-sidebar');
+        const mobileOverlay = document.getElementById('mobile-overlay');
+
+        function toggleMobileMenu() {
+            // جابجایی کلاس‌ها برای نمایش یا مخفی کردن
+            mobileSidebar.classList.toggle('translate-x-full');
+            mobileOverlay.classList.toggle('hidden');
+        }
+
+        // رویدادهای کلیک
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+        closeMenuBtn.addEventListener('click', toggleMobileMenu);
+        // بسته شدن منو با کلیک روی فضای تاریک بیرون آن
+        mobileOverlay.addEventListener('click', toggleMobileMenu);
+    </script>
+
+    <!-- مودال (پاپ‌آپ) نیاز به ورود -->
+    <div id="login-modal" class="fixed inset-0 bg-black/60 z-[100] hidden items-center justify-center backdrop-blur-sm transition-opacity opacity-0 duration-300">
+        <div id="login-modal-content" class="bg-white dark:bg-slate-800 rounded-3xl p-8 max-w-sm w-full mx-4 shadow-2xl transform scale-95 transition-transform duration-300 border border-gray-100 dark:border-slate-700 relative">
+            
+            <!-- دکمه بستن (ضربدر) -->
+            <button onclick="closeLoginModal()" class="absolute top-4 right-4 text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            
+            <!-- محتوای پیام -->
+            <div class="text-center mt-2">
+                <div class="text-6xl mb-4 drop-shadow-md">🔒</div>
+                <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-2">نیاز به ورود</h3>
+                <p class="text-gray-600 dark:text-gray-400 mb-8 font-medium text-sm">لطفا ابتدا وارد حساب کاربری خود شوید.</p>
+                
+                <!-- دکمه‌های انتقال -->
+                <a href="{% url 'users:login' %}" class="block w-full bg-yellow-500 text-slate-900 font-black py-3.5 px-4 rounded-xl hover:bg-yellow-400 transition shadow-lg hover:-translate-y-1 mb-3">ورود به حساب کاربری</a>
+                <a href="{% url 'users:register' %}" class="block w-full bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-gray-300 font-bold py-3.5 px-4 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition">ثبت‌نام در سایت</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // اسکریپت‌های کنترل‌کننده مودال لاگین
+        const loginModal = document.getElementById('login-modal');
+        const loginModalContent = document.getElementById('login-modal-content');
+
+        function openLoginModal() {
+            loginModal.classList.remove('hidden');
+            loginModal.classList.add('flex');
+            // یک تاخیر بسیار کوتاه برای اجرای انیمیشن‌های CSS
+            setTimeout(() => {
+                loginModal.classList.remove('opacity-0');
+                loginModalContent.classList.remove('scale-95');
+                loginModalContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeLoginModal() {
+            loginModal.classList.add('opacity-0');
+            loginModalContent.classList.remove('scale-100');
+            loginModalContent.classList.add('scale-95');
+            setTimeout(() => {
+                loginModal.classList.add('hidden');
+                loginModal.classList.remove('flex');
+            }, 300); // همگام با زمان duration-300
+        }
+    </script>
+</body>
+</html>

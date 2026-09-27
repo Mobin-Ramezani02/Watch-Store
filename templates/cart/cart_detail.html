@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}سبد خرید شما | تیک‌آرت{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-10">
+    <h1 class="text-2xl font-bold mb-8 border-r-4 border-yellow-500 pr-3 text-slate-800">سبد خرید شما</h1>
+    
+    {% if cart|length > 0 %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-right border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 text-gray-500 text-sm border-b">
+                        <th class="p-4 font-semibold">محصول</th>
+                        <th class="p-4 font-semibold">تعداد</th>
+                        <th class="p-4 font-semibold">قیمت واحد</th>
+                        <th class="p-4 font-semibold">قیمت کل</th>
+                        <th class="p-4 font-semibold text-center">حذف</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in cart %}
+                    <tr class="border-b hover:bg-gray-50 transition">
+                        <td class="p-4 flex items-center gap-4">
+                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-16 h-16 object-cover rounded shadow-sm">
+                            <a href="{% url 'shop:product_detail' item.product.id item.product.slug %}" class="font-bold text-slate-800 hover:text-yellow-600">{{ item.product.name }}</a>
+                        </td>
+                        <td class="p-4 font-bold text-gray-700">{{ item.quantity }}</td>
+                        <td class="p-4 text-gray-600">{{ item.price|intcomma }} تومان</td>
+                        <td class="p-4 font-bold text-yellow-600">{{ item.total_price|intcomma }} تومان</td>
+                        <td class="p-4 text-center">
+                            <form action="{% url 'cart:cart_remove' item.product.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="text-red-500 hover:text-red-700 text-xl font-bold">×</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-8 flex flex-col md:flex-row justify-between items-center bg-gray-50 p-6 rounded-xl border">
+            <span class="text-lg font-semibold text-gray-600 mb-4 md:mb-0">جمع کل مبلغ پرداختی:</span>
+            <span class="text-3xl font-bold text-slate-900">{{ cart.get_total_price|intcomma }} <span class="text-sm font-normal text-gray-500">تومان</span></span>
+        </div>
+        
+        <div class="mt-6 flex justify-end gap-4">
+            <a href="{% url 'shop:product_list' %}" class="px-6 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-gray-100 transition font-medium">ادامه خرید</a>
+            <a href="{% url 'orders:order_create' %}" class="px-8 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-bold shadow-lg">تایید و پرداخت</a>
+        </div>
+    {% else %}
+        <div class="text-center py-12">
+            <p class="text-gray-500 text-lg mb-6">سبد خرید شما خالی است.</p>
+            <a href="{% url 'shop:product_list' %}" class="inline-block px-8 py-3 bg-slate-900 text-white rounded-lg hover:bg-yellow-500 hover:text-slate-900 transition font-bold">بازگشت به فروشگاه</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

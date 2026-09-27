@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}سفارش ثبت شد | تیک‌آرت{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-12 rounded-2xl shadow-sm border border-gray-100 text-center mb-10">
+    <div class="text-green-500 text-6xl mb-4">✓</div>
+    <h1 class="text-3xl font-bold text-slate-900 mb-4">سفارش شما با موفقیت ثبت شد!</h1>
+    <p class="text-gray-600 mb-6">شماره پیگیری سفارش شما: <strong class="text-yellow-600 text-xl">{{ order.id }}</strong></p>
+    <p class="text-gray-500 text-sm mb-8">در مرحله بعد به درگاه پرداخت متصل خواهید شد (این بخش به زودی فعال می‌شود).</p>
+    <a href="{% url 'shop:product_list' %}" class="px-8 py-3 bg-slate-900 text-white rounded-lg hover:bg-yellow-500 hover:text-slate-900 transition font-bold">بازگشت به فروشگاه</a>
+</div>
+{% endblock %}

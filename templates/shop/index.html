@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}تیک‌آرت | گالری ساعت‌های لوکس و مدرن{% endblock %}
+
+{% block content %}
+<!-- بخش ۱: بنر اصلی (Hero Section) با گرادیان مدرن -->
+<div class="relative bg-gradient-to-br from-slate-100 to-gray-50 dark:from-slate-900 dark:to-slate-800 rounded-[2.5rem] p-10 md:p-20 mb-20 flex flex-col md:flex-row items-center justify-between shadow-sm border border-white/50 dark:border-slate-700/50 overflow-hidden group">
+    <!-- افکت نوری پس‌زمینه برای تم شب -->
+    <div class="absolute top-0 right-0 -mr-20 -mt-20 w-64 h-64 rounded-full bg-yellow-500/10 blur-3xl dark:bg-yellow-500/5"></div>
+    
+    <!-- متن بنر -->
+    <div class="w-full md:w-1/2 z-10 text-right md:pr-10">
+        <span class="inline-block py-1 px-3 rounded-full bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-500 text-sm font-bold mb-4 border border-yellow-200 dark:border-yellow-700/50">کالکشن ۲۰۲۶</span>
+        <h1 class="text-4xl md:text-6xl font-black text-slate-900 dark:text-white mb-6 leading-tight drop-shadow-sm transition-colors">
+            تعریف جدیدی از <br> <span class="text-transparent bg-clip-text bg-gradient-to-l from-yellow-600 to-yellow-400">لوکس بودن</span>
+        </h1>
+        <p class="text-gray-600 dark:text-gray-400 mb-10 text-lg leading-relaxed max-w-md">خرید جدیدترین و اصیل‌ترین ساعت‌های مچی جهان با گارانتی مادام‌العمر و ارسال فوری.</p>
+        <a href="{% url 'shop:product_list' %}" class="inline-block bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-bold px-8 py-4 rounded-full hover:shadow-2xl hover:shadow-slate-900/20 dark:hover:shadow-white/10 transition-all duration-300 hover:-translate-y-1">
+            مشاهده کالکشن‌ها
+        </a>
+    </div>
+    
+    <!-- عکس بنر -->
+    <div class="w-full md:w-1/2 z-10 mt-12 md:mt-0 flex justify-center relative">
+        {% if products %}
+            <img src="{{ products.0.image.url }}" alt="ساعت لوکس" class="w-3/4 object-contain drop-shadow-2xl group-hover:scale-105 transition-transform duration-700">
+        {% else %}
+            <div class="w-64 h-64 bg-gray-200 dark:bg-slate-700 rounded-full flex items-center justify-center text-gray-400">بدون تصویر</div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- بخش ۳: ساعت‌های برگزیده هفته (کارت‌های مدرن) -->
+<div class="mb-24">
+    <div class="flex justify-between items-end mb-10">        
+        <div>
+            <h3 class="text-3xl font-black text-slate-900 dark:text-white transition-colors">ساعت‌های برگزیده</h3>
+            <p class="text-gray-500 dark:text-gray-400 mt-2">پرطرفدارترین انتخاب‌های این هفته</p>
+        </div>
+        <a href="{% url 'shop:product_list' %}" class="hidden md:flex items-center gap-2 text-yellow-600 dark:text-yellow-500 font-bold hover:gap-4 transition-all">مشاهده همه <span class="text-xl">←</span></a>
+    </div>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {% for product in products %}
+        <!-- ساختار کارت نئومورفیسم / Glass -->
+        <div class="group bg-white dark:bg-slate-800/80 rounded-3xl p-5 shadow-sm hover:shadow-2xl hover:shadow-slate-200 dark:hover:shadow-black/50 border border-gray-100 dark:border-slate-700 backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 flex flex-col relative overflow-hidden">
+            
+            <!-- دکمه پسندیدن (قلب) دکوری -->
+            <button class="absolute top-5 right-5 z-10 text-gray-300 hover:text-red-500 dark:text-gray-600 dark:hover:text-red-500 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+            </button>
+
+            <!-- عکس محصول با افکت هاور -->
+            <a href="{% url 'shop:product_detail' product.id product.slug %}" class="block mb-6 relative w-full h-56 bg-gray-50 dark:bg-slate-900/50 rounded-2xl p-4 overflow-hidden">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-contain mix-blend-multiply dark:mix-blend-normal group-hover:scale-110 transition duration-500">
+            </a>
+            
+            <!-- اطلاعات محصول -->
+            <div class="flex-grow flex flex-col">
+                <h4 class="text-xs font-bold text-yellow-600 dark:text-yellow-500 tracking-wider mb-2 uppercase">{{ product.brand }}</h4>
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-2 line-clamp-1 transition-colors">{{ product.name }}</h3>
+                <p class="text-gray-500 dark:text-gray-400 text-sm line-clamp-2 mb-4">{{ product.description }}</p>
+                
+                <!-- قیمت و دکمه خرید در یک ردیف -->
+                <div class="mt-auto flex items-center justify-between">
+                    <div class="text-lg font-black text-slate-900 dark:text-white transition-colors">{{ product.price|intcomma }} <span class="text-xs font-normal text-gray-500">تومان</span></div>
+                    <a href="{% url 'shop:product_detail' product.id product.slug %}" class="bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white p-3 rounded-xl hover:bg-yellow-500 dark:hover:bg-yellow-500 hover:text-white transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <p class="text-gray-500 col-span-full text-center">هنوز ساعتی ثبت نشده است.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
